@@ -2,6 +2,7 @@ import { config } from "dotenv";
 import { connectDB } from "./Core/db.js";
 import { app } from "./app.js";
 
+
 config(".env");
 
 connectDB();
