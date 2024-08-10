@@ -11,5 +11,13 @@ class errorHandling extends Error {
         this.success = false;
     }
 }
+const sendErroWithMessage=async(req,res,statusCode,message="Something went wrong")=>{
+   return res.status(statusCode).json({
+           response_code:statusCode,
+           key_error:{
+               message:message
+           }
+   })
+}
 
-export {errorHandling};
+export default {errorHandling,sendErroWithMessage};
