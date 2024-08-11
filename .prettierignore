@@ -1,0 +1,7 @@
+/node_modules
+./dist
+
+# environment variable file 
+*.env
+.env
+.env.*
