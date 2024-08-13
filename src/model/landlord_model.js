@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
-import { landlord_collection } from "../constant";
+import { LANDLORD_COLLECTION } from "../constant";
+import { required } from "joi";
 
 
 const Schema=new mongoose.Schema({
     _userId:{
-        type:String,
-        required:true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
     },
     address:{
         type:String,
@@ -27,11 +29,19 @@ const Schema=new mongoose.Schema({
         type:String,
         required:true,
     },
+    description:{
+        type:{
+            price: {type: Number, required: true},
+            roomType: {type:String, required: true},
+            details:{type: String}
+        },
+        required: true
+    }
 
 
 },{timestamps:true,versionKey:false});
 
 
-const model=mongoose.model(landlord_collection,Schema);
+const Landlord = mongoose.model(LANDLORD_COLLECTION,Schema);
 
-export default model;
+export default Landlord;
