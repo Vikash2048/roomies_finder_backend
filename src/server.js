@@ -1,20 +1,19 @@
 import { config } from "dotenv";
 import { connectDB } from "./Core/db.js";
 import { app } from "./app.js";
+import userRouter from "./routes/user.router.js"
 
 
 config(".env");
-
-connectDB();
-
 const PORT = process.env.PORT;
 
-//user registration
-app.post("/register",(req,res) => {
-    const {userName, fullName} = req.body;
-    console.log(userName);
+connectDB()
+.then(() => {
+    app.listen(PORT || 5000, () => {
+        console.log("Server is successfully hosted");
+    })
+})
+.catch((err) => {
+    console.log("error while db connection...")
 })
 
-app.listen(PORT, () => {
-    console.log(`server in running on port ${PORT}`)
-})

@@ -33,7 +33,12 @@ const Schema=new mongoose.Schema({
         type:{
             price: {type: Number, required: true},
             roomType: {type:String, required: true},
-            details:{type: String}
+            mobile: {type: String, required: true},
+            details: {
+                bhk: {type: String, required: true},
+                near_landmark: {type: String, required: true},
+                extra_detail: {type: String} 
+            }
         },
         required: true
     }

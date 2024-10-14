@@ -20,10 +20,6 @@ userSchema = new mongoose.Schema({
         required: true,
         lower: true,
     },
-    avatar:{
-        type: string, // url
-        required: true,
-    },
     mobile:{
         type: Number,
         required: true,
@@ -38,28 +34,34 @@ userSchema = new mongoose.Schema({
     }
 },{timestamps: true, versionKey: false})
 
-userSchema.pre("save", async function(next) {
+
+
+// methods
+userSchema.pre("save", async function (next) {
     // for checking only if passwordd is change then bcrypt it
     if(!this.isModified("password")) return next();
 
     this.password = bcrypt.hash(this.password,10);
     next();
-})
+} )
 
 // creating method to check that passwrod is correct or not 
-userSchema.methods.isPasswordCorrect = async function(password){
+userSchema.methods.isPasswordCorrect = async function (password){
     return await bcrypt.compare(password,this.password);
 }
 
+// creating tokens 
 userSchema.methods.generateAccessToken = async function(){
     jwt.sign(
         {
             _id: this._id,
             fullName: this.fullName,
+            userName: this.userName,
+            email: this.email
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-            expireIn: process.ACCESS_TOKEN_EXPIRY
+            expireIn: process.env.ACCESS_TOKEN_EXPIRY
         }
     )
 }
@@ -71,9 +73,12 @@ userSchema.methods.generateRefreshToken = async function(){
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
-            expireIn: process.REFRESH_TOKEN_EXPIRY
+            expireIn: process.env.REFRESH_TOKEN_EXPIRY
         }
     )
 }
 
-export const User = mongoose.model(USER_COLLECTION_NAME,userSchema);
+const User = mongoose.model( USER_COLLECTION_NAME, userSchema );
+
+export { User }
+
