@@ -18,7 +18,8 @@ const schema = new mongoose.Schema({
     description:{
         type:{
             price: {type: Number, required: true},
-            roomType: {type:String, required: true},
+            roomType: {type: String, enum: ["PG", "Flat"], required: true},
+            roomFor: {type:String, required: true, enum:["boys", "girl", "unisex"]},
             details: {
                 bhk: {type: String, required: true},
                 near_landmark: {type: String, required: true},

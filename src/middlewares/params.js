@@ -1,18 +1,10 @@
-import { HTTPS } from "../constant.js";
-import validators from "../Core/validators.js";
-import errorHandling from '../utils/errorHandling.js'
+import { user_validator } from "../Core/validators.js";
+import { ApiError } from "../utils/ApiError.js";
+import { asyncHandler } from "../utils/asynchandler.js";
 
-export const landlord_address_params=async(req,res,next)=>{
-    try {
-      const  {error} = await validators.landlord_address_validator(req);
-      if (error) {
-        return errorHandling.sendErroWithMessage(req,res,HTTPS.HTTP_BAD_REQUEST,error.details[0].message,
-        );
-      }
-      next();
-    } catch (err) {
-      next(err);
-    }
-};
-
+export const user_params_validate = asyncHandler( async (req, res, next) => {
+  const isValidate = await user_validator( req );
+  if (isValidate.error) throw new ApiError(400, isValidate.error)
+  next();
+} )
 

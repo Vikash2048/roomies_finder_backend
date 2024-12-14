@@ -1,7 +1,6 @@
 import { config } from "dotenv";
 import { connectDB } from "./Core/db.js";
 import { app } from "./app.js";
-import userRouter from "./routes/user.router.js"
 
 
 config(".env");

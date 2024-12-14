@@ -5,12 +5,6 @@ import { USER_COLLECTION_NAME } from "../constant";
 
 
 userSchema = new mongoose.Schema({
-    userName:{
-        type: String,
-        required: true,
-        unique: true,
-        index: true,
-    },
     fullName:{
         type: String,
         required: true,
@@ -30,6 +24,7 @@ userSchema = new mongoose.Schema({
     },
     userType:{
         type: String,
+        enum: ["Landlord", "Roommate Seeker", "Room Seeker"],
         required: true
     }
 },{timestamps: true, versionKey: false})
@@ -37,6 +32,7 @@ userSchema = new mongoose.Schema({
 
 
 // methods
+
 userSchema.pre("save", async function (next) {
     // for checking only if passwordd is change then bcrypt it
     if(!this.isModified("password")) return next();
