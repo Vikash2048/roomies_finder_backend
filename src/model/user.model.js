@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { USER_COLLECTION_NAME } from "../constant";
+import { USER_COLLECTION_NAME } from "../constant.js";
 
-
-userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     fullName:{
         type: String,
         required: true,
@@ -26,6 +25,15 @@ userSchema = new mongoose.Schema({
         type: String,
         enum: ["Landlord", "Roommate Seeker", "Room Seeker"],
         required: true
+    },
+    avatar:{
+        type: String,
+    },
+    refreshToken:{
+        type: String,
+    },
+    accessToken:{
+        type: String,
     }
 },{timestamps: true, versionKey: false})
 
