@@ -31,13 +31,8 @@ const userSchema = new mongoose.Schema({
     },
     refreshToken:{
         type: String,
-    },
-    accessToken:{
-        type: String,
     }
 },{timestamps: true, versionKey: false})
-
-
 
 // methods
 
@@ -45,7 +40,7 @@ userSchema.pre("save", async function (next) {
     // for checking only if passwordd is change then bcrypt it
     if(!this.isModified("password")) return next();
 
-    this.password = bcrypt.hash(this.password,10);
+    this.password = await bcrypt.hash(this.password, 10);
     next();
 } )
 
@@ -56,28 +51,27 @@ userSchema.methods.isPasswordCorrect = async function (password){
 
 // creating tokens 
 userSchema.methods.generateAccessToken = async function(){
-    jwt.sign(
+    return jwt.sign(
         {
             _id: this._id,
             fullName: this.fullName,
-            userName: this.userName,
             email: this.email
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-            expireIn: process.env.ACCESS_TOKEN_EXPIRY
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
         }
     )
 }
 
 userSchema.methods.generateRefreshToken = async function(){
-    jwt.sign(
+    return jwt.sign(
         {
             _id: this._id,
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
-            expireIn: process.env.REFRESH_TOKEN_EXPIRY
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
         }
     )
 }

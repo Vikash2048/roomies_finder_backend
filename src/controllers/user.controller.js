@@ -30,6 +30,8 @@ const registerUser = asyncHandler( async ( req, res) => {
         avatar: avatar.url
     })
 
+    user.save();
+
     const userCreated = await User.findById(user._id).select( "-password")
     console.log(userCreated);
 
@@ -43,4 +45,106 @@ const registerUser = asyncHandler( async ( req, res) => {
       .json(new apiResponse(200, userCreated, "User successfull registered"))
 })
 
-export { registerUser }
+const generateRefreshAccessToken = async ( userId ) => {
+    try {
+        const user = await User.findById( userId );
+        const accessToken = await user.generateAccessToken();
+        const refreshToken = await user.generateRefreshToken();
+
+        user.refreshToken = refreshToken;
+
+        await user.save( {validateBeforeSave: false} );
+        return { accessToken, refreshToken }
+    } catch (error) {
+        throw new ApiError(500, "something went wrong while generating the tokens : ",error.msg);
+    }
+}
+
+const loginUser = asyncHandler( async (req, res) => {
+    // get user detail from body
+    const { email, password } = req.body;
+
+    // verify that user present in db or not if not the return them error saying register first
+    const user = await User.findOne({ email });
+    if ( !user ) throw new ApiError(404, "User not register, please register yourself first");
+
+    // if present the check user detail like email and password
+    const isPasswordCorrect = await user.isPasswordCorrect(password);
+    if ( !isPasswordCorrect ) throw new ApiError(400, "Password is incorrect, try again")
+
+    // if everything go well then create refresh and access token and then logged in user
+    const { accessToken, refreshToken } = await generateRefreshAccessToken( user._id );
+    // console.log("tokens: ", accessToken, refreshToken)
+
+    const loggedInUser = await User.findById( user._id ).select("-password -refreshToken");
+
+    // send cookies 
+    const options = {
+        httpOnly: true,
+        secure: true,
+    }
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(new apiResponse(
+            200,
+            {
+                user: loggedInUser,
+                accessToken,
+                refreshToken
+            },
+            "user loggedin successfully"
+        ));
+})
+
+const logoutUser = asyncHandler( async (req, res) => {
+    // get user
+    const user = req.user;
+    // console.log(user)
+
+    // remove cookies from database and http cookies
+    const updatedUser = await User.findOneAndUpdate(
+        { _id: user._id},
+        {
+            $set: { refreshToken: ""}
+        },
+        { new: true},
+    )
+
+    // update the data base
+    const options = {
+        http: true,
+        secure: true,
+    }
+
+    console.log('updated user: ', updatedUser)
+
+    // return 
+    return res
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json( new apiResponse( 200, {}, "user logout successfully"))
+})
+
+const forgetPassword = asyncHandler( async (req, res) => {
+    // get the user 
+    const user = req.user;
+    // get the updated password and the confirm password
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    if ( newPassword !== confirmPassword ) throw new ApiError(400, "new password and confirm password did not matched")
+    if ( currentPassword === newPassword ) throw new ApiError(400, "new password and current password can not be same")
+
+    // replace the updated password with the old password 
+    user.password = newPassword
+    user.save({validateBeforeSave: false})
+    // return the user
+    return res
+        .status(200)
+        .json(new apiResponse(200,{}, "Password updated successfully"))
+})
+
+export { registerUser, loginUser, logoutUser, forgetPassword }
+
