@@ -6,21 +6,31 @@ export const landlord_address_validator=async(req)=>{
             'string.empty':"address can not be empty",
             'any.required':'address is required field',
         }),
-        images:Joi.string().required().messages({
-            'string.base':'images should of string type',
-            'string.empty':"images can not be empty",
-            'any.required':'images is required field',
-        }),
         mobile:Joi.string().required().messages({
             'string.base':'mobile should of string type',
             'string.empty':"mobile can not be empty",
             'any.required':'mobile is required field',
         }),
-        email:Joi.string().required().messages({
-            'string.base':'email should of string type',
-            'string.empty':"email can not be empty",
-            'any.required':'email is required field',
-        })
+        price:Joi.string().required().messages({
+            'string.base':'mobile should of string type',
+            'string.empty':"mobile can not be empty",
+            'any.required':'mobile is required field',
+        }),
+        roomType:Joi.string().required().messages({
+            'string.base':'mobile should of string type',
+            'string.empty':"mobile can not be empty",
+            'any.required':'mobile is required field',
+        }),
+        roomFor:Joi.string().required().messages({
+            'string.base':'mobile should of string type',
+            'string.empty':"mobile can not be empty",
+            'any.required':'mobile is required field',
+        }),
+        bhk:Joi.string().required().messages({
+            'string.base':'mobile should of string type',
+            'string.empty':"mobile can not be empty",
+            'any.required':'mobile is required field',
+        }),
     })
    
     return schema.validate(req.body);

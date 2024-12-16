@@ -8,7 +8,7 @@ app.use(cors({
     origin: process.env.CORS_ORIGIN,
     Credential:true
 }))
-app.use(express.json({limit:"20kb"}));
+app.use(express.json({limit:"50kb"}));
 app.use(express.urlencoded({extends: true}));
 app.use(express.static("public"));
 app.use(cookieParser())
@@ -16,8 +16,12 @@ app.use(cookieParser())
 
 // decalaration of routes 
 import userRouter from "./routes/user.router.js"
+import landlordRouter from "./routes/landlord.router.js"
 
-app.use("/api/v1/user",userRouter);
+app.use("/api/v1/user", userRouter);
+
+app.use("/api/v1/landlord", landlordRouter);
+
 
 app.use(cookieParser());
 

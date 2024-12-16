@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { LANDLORD_COLLECTION } from "../constant";
+import { LANDLORD_COLLECTION } from "../constant.js";
 
 
 const Schema=new mongoose.Schema({
@@ -12,9 +12,9 @@ const Schema=new mongoose.Schema({
         type:String,
         required:true
     },
-    images:{
+    roomImage:{
         type:[String],
-        required:true,
+        // required:true,
     },
     mobile:{
         type:String,
@@ -27,9 +27,13 @@ const Schema=new mongoose.Schema({
             roomFor: {type:String, required: true, enum:["boys", "girl", "unisex"]},
             details: {
                 bhk: {type: String, required: true},
-                near_landmark: {type: String, required: true},
+                nearLandMark: {type: String},
                 extra_detail: {type: String} 
-            }
+            },
+            location:{
+                lat: {type: String},
+                lng: {type: String}
+            },
         },
         required: true
     }
