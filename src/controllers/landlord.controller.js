@@ -1,4 +1,3 @@
-import jwt from "jsonwebtoken";
 import { User } from "../model/user.model.js";
 import { asyncHandler } from "../utils/asynchandler.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -68,7 +67,9 @@ const removeDetails = asyncHandler( async( req, res) => {
     //get the current User
     const currentUser = req.user;
 
-    const deletedUser = await User.deleteOne(currentUser._id)
+    const currentAddress = await Landlord.findById("6761b3d5b5c3507968fc2391");
+
+    const deletedUser = await Landlord.deleteOne(currentAddress)
     if ( !deletedUser ) throw new ApiError(500, "Unable to delete the data")
 
     return res
@@ -76,6 +77,27 @@ const removeDetails = asyncHandler( async( req, res) => {
         .json(new apiResponse(200,{}, "successfully delete the user house details"))
 })
 
+const getAllRooms = asyncHandler( async(req, res) => {
+    const currentUser = req.user;
+    // console.log("current user : ", currentUser)
+
+    const allRooms = await Landlord.find({_userId: currentUser._id})
+    if (!allRooms) throw new ApiError(400, "not able to get all content of user")
+    // console.log(allRooms)
+
+    return res
+        .status(200)
+        .json(new apiResponse(200, {allRooms}, "Successfully abstract the User house details"))
+})
+
+const getSingleRooms = asyncHandler( async(req, res) => {
+
+})
+
+const updateRoomDetails = asyncHandler( async(req, res) =>{
+
+})
 
 
-export { addDetails, removeDetails }
+
+export { addDetails, removeDetails, getAllRooms }

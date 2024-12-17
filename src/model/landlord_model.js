@@ -35,11 +35,10 @@ const Schema=new mongoose.Schema({
                 lng: {type: String}
             },
         },
+        _id:false,
         required: true
     }
-
-
-},{timestamps:true,versionKey:false});
+},{timestamps:true,versionKey:false}); 
 
 
 const Landlord = mongoose.model(LANDLORD_COLLECTION,Schema);

@@ -15,10 +15,14 @@ const registerUser = asyncHandler( async ( req, res) => {
     if( existedUser ) throw new ApiError(400,"User with email id already exist.");
 
     // uploading avatar file on cloudinary
-    const avatarLocalPath = await req.file.path;
+    const avatarLocalPath = await req.file?.path;
+    let avatar;
 
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
-    if ( !avatar ) throw new ApiError(500, "Error while uploading image on cloudinary")
+    if (avatarLocalPath) {
+        avatar = await uploadOnCloudinary(avatarLocalPath)
+        if ( !avatar ) throw new ApiError(500, "Error while uploading image on cloudinary")
+    }
+    
 
     // if not create a user
     const user = await User.create({
@@ -27,7 +31,7 @@ const registerUser = asyncHandler( async ( req, res) => {
         mobile, 
         password,
         userType,
-        avatar: avatar.url
+        avatar: avatar?.url
     })
 
     user.save();
