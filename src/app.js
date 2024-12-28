@@ -17,10 +17,13 @@ app.use(cookieParser())
 // decalaration of routes 
 import userRouter from "./routes/user.router.js"
 import landlordRouter from "./routes/landlord.router.js"
+import roomateseekerRouter from "./routes/roomateseeker.router.js"
 
 app.use("/api/v1/user", userRouter);
 
 app.use("/api/v1/landlord", landlordRouter);
+
+app.use("/api/v1/roomateseeker", roomateseekerRouter);
 
 
 app.use(cookieParser());

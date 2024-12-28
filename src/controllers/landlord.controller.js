@@ -8,7 +8,7 @@ import { uploadOnCloudinary } from "../utils/uploadRoomCloudinary.js";
 
 const addDetails = asyncHandler( async( req, res ) => {
     // get all details
-    const { address, mobile, price, roomType, roomFor, bhk, nearLandMark, extraDetail, location } = req.body;
+    const { address, mobile, price, roomType, roomFor, bhk, nearLandMark, extraDetail, lat, lng } = req.body;
     // check that all value are present 
     if ( [address, mobile, price, roomType, roomFor, bhk ].some((field) => field?.trim() === "") ){
         throw new ApiError(400, "All field are required");
@@ -21,20 +21,15 @@ const addDetails = asyncHandler( async( req, res ) => {
         localRoomsImagePath.push(item.path)
     ) )
 
-
     const imagesUrl = await uploadOnCloudinary(localRoomsImagePath);
     
-
     // get the current user
     const currentUser = req.user;
-
     const user = await User.findById( currentUser._id);
     console.log("user", user)
     if( !user ) throw new ApiError(500, "user not found");
 
-
     // add all the details to the database
-
     const addHouseDetail = await Landlord.create({
         _userId: user._id,
         address,
@@ -49,18 +44,19 @@ const addDetails = asyncHandler( async( req, res ) => {
                 nearLandMark,
                 extraDetail,
             },
-            location,
+            location:{
+                lat,
+                lng
+            },
         }
     })
 
     addHouseDetail.save()
-
     if (!addHouseDetail )throw new ApiError(400, "not able to add details")
- 
+
     return res
         .status(200)
         .json(new apiResponse(200, {addHouseDetail}, "House address added successfully"))
-
 });
 
 const removeDetails = asyncHandler( async( req, res) => {
@@ -80,7 +76,6 @@ const removeDetails = asyncHandler( async( req, res) => {
 const getAllRooms = asyncHandler( async(req, res) => {
     const currentUser = req.user;
     // console.log("current user : ", currentUser)
-
     const allRooms = await Landlord.find({_userId: currentUser._id})
     if (!allRooms) throw new ApiError(400, "not able to get all content of user")
     // console.log(allRooms)
@@ -91,13 +86,19 @@ const getAllRooms = asyncHandler( async(req, res) => {
 })
 
 const getSingleRooms = asyncHandler( async(req, res) => {
+    const currentRoomId = req.currentRoomId;
 
+    const room = await Landlord.findById(currentRoomId._id);
+    if ( !room ) throw new ApiError(400,"not able to fetch the single room")
+
+    return res
+        .status(200)
+        .json(new apiResponse(200, {room}, "Successfully fetch the data"))
 })
 
 const updateRoomDetails = asyncHandler( async(req, res) =>{
-
 })
 
 
 
-export { addDetails, removeDetails, getAllRooms }
+export { addDetails, removeDetails, getAllRooms, getSingleRooms, updateRoomDetails }
