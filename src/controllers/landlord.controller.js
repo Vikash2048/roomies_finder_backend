@@ -6,7 +6,7 @@ import { apiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloudinary } from "../utils/uploadRoomCloudinary.js";
 
 
-const addDetails = asyncHandler( async( req, res ) => {
+const addHouseDetails = asyncHandler( async( req, res ) => {
     // get all details
     const { address, mobile, price, roomType, roomFor, bhk, nearLandMark, extraDetail, lat, lng } = req.body;
     // check that all value are present 
@@ -59,18 +59,18 @@ const addDetails = asyncHandler( async( req, res ) => {
         .json(new apiResponse(200, {addHouseDetail}, "House address added successfully"))
 });
 
-const removeDetails = asyncHandler( async( req, res) => {
+const removeHouseDetails = asyncHandler( async( req, res) => {
     //get the current User
     const currentUser = req.user;
-
-    const currentAddress = await Landlord.findById("6761b3d5b5c3507968fc2391");
-
-    const deletedUser = await Landlord.deleteOne(currentAddress)
-    if ( !deletedUser ) throw new ApiError(500, "Unable to delete the data")
-
-    return res
-        .status(200)
-        .json(new apiResponse(200,{}, "successfully delete the user house details"))
+    
+        const currentAddress = await Roommate.findById("67700e721541b7f49b2b094c");  // give here the id
+        console.log(currentAddress);
+        const deletedHouse = await Roommate.deleteOne({_id: "67700e721541b7f49b2b094c"})  // give here the id
+        if ( !deletedHouse ) throw new ApiError(500, "Unable to delete the data")
+    
+        return res
+            .status(200)
+            .json(new apiResponse(200,{}, "successfully delete the user house details"))
 })
 
 const getAllRooms = asyncHandler( async(req, res) => {
@@ -96,9 +96,47 @@ const getSingleRooms = asyncHandler( async(req, res) => {
         .json(new apiResponse(200, {room}, "Successfully fetch the data"))
 })
 
-const updateRoomDetails = asyncHandler( async(req, res) =>{
+const updateHouseDetails = asyncHandler( async(req, res) =>{
+    const { address, mobile, price, roomType, roomFor, bhk, nearLandMark, extraDetail, lat, lng } = req.body;
+    const houseImage = req.files;
+    const localRoomsImagePath = [];
+    houseImage.map( (item) => (
+        localRoomsImagePath.push(item.path)
+    ) )
+
+    let imagesUrl = null;   
+    if( houseImage !== null ){
+        imagesUrl = await uploadOnCloudinary(localRoomsImagePath);
+    }
+
+    const currentRoomId = req.currentRoomId;
+    const updatedRoom = await Landlord.findByIdAndUpdate(currentRoomId._id, {
+        address,
+        mobile,
+        roomImage: imagesUrl,
+        description:{
+            price,
+            roomType,
+            roomFor,
+            details:{
+                bhk,
+                nearLandMark,
+                extraDetail,
+            },
+            location:{
+                lat,
+                lng
+            },
+        }
+    })
+
+    if ( !updatedRoom ) throw new ApiError(500, "not able to update the data")
+
+    return res
+        .status(200)
+        .json(new apiResponse(200, {updatedRoom}, "Successfully updated the data"))
 })
 
 
 
-export { addDetails, removeDetails, getAllRooms, getSingleRooms, updateRoomDetails }
+export { addHouseDetails, removeHouseDetails, getAllRooms, getSingleRooms, updateHouseDetails }
