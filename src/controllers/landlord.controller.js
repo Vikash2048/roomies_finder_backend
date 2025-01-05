@@ -4,11 +4,13 @@ import { ApiError } from "../utils/ApiError.js";
 import Landlord from "../model/landlord_model.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloudinary } from "../utils/uploadRoomCloudinary.js";
+import { getCoordinates } from "../utils/getCoordinates.js"
 
 
 const addHouseDetails = asyncHandler( async( req, res ) => {
     // get all details
-    const { address, mobile, price, roomType, roomFor, bhk, nearLandMark, extraDetail, lat, lng } = req.body;
+    const { address, mobile, price, roomType, roomFor, bhk, nearLandMark, extraDetail } = req.body;
+
     // check that all value are present 
     if ( [address, mobile, price, roomType, roomFor, bhk ].some((field) => field?.trim() === "") ){
         throw new ApiError(400, "All field are required");
@@ -26,8 +28,11 @@ const addHouseDetails = asyncHandler( async( req, res ) => {
     // get the current user
     const currentUser = req.user;
     const user = await User.findById( currentUser._id);
-    console.log("user", user)
+    // console.log("user", user)
     if( !user ) throw new ApiError(500, "user not found");
+
+    const { lat, lng } = await getCoordinates(address);
+    if ( !lat || !lng ) throw new ApiError(401, "not able to convert location into coordinates")
 
     // add all the details to the database
     const addHouseDetail = await Landlord.create({
@@ -97,7 +102,7 @@ const getSingleRooms = asyncHandler( async(req, res) => {
 })
 
 const updateHouseDetails = asyncHandler( async(req, res) =>{
-    const { address, mobile, price, roomType, roomFor, bhk, nearLandMark, extraDetail, lat, lng } = req.body;
+    const { address, mobile, price, roomType, roomFor, bhk, nearLandMark, extraDetail} = req.body;
     const houseImage = req.files;
     const localRoomsImagePath = [];
     houseImage.map( (item) => (
@@ -108,6 +113,9 @@ const updateHouseDetails = asyncHandler( async(req, res) =>{
     if( houseImage !== null ){
         imagesUrl = await uploadOnCloudinary(localRoomsImagePath);
     }
+
+    const { lat, lng } = await getCoordinates(address);
+    if ( !lat || !lng ) throw new ApiError(401, "not able to convert location into coordinates")
 
     const currentRoomId = req.currentRoomId;
     const updatedRoom = await Landlord.findByIdAndUpdate(currentRoomId._id, {
@@ -136,7 +144,5 @@ const updateHouseDetails = asyncHandler( async(req, res) =>{
         .status(200)
         .json(new apiResponse(200, {updatedRoom}, "Successfully updated the data"))
 })
-
-
 
 export { addHouseDetails, removeHouseDetails, getAllRooms, getSingleRooms, updateHouseDetails }

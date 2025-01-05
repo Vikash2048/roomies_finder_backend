@@ -11,7 +11,7 @@ const schema = new mongoose.Schema({
         type: String,
         required: true
     },
-    images: {
+    roomImage: {
         type: [String],
         required: true
     },
@@ -28,8 +28,8 @@ const schema = new mongoose.Schema({
                 ownerMobile: {type: Number, required: true}
             },
             location:{
-                lat: {type: String},
-                lng: {type: String}
+                lat: {type: Number},
+                lng: {type: Number}
             },
         },
         _id:false,
@@ -37,5 +37,7 @@ const schema = new mongoose.Schema({
     }
 
 },{timestamps:true,versionKey:false});
+// Add geospatial index for location field
+schema.index({ 'description.location': '2dsphere' });
 
 export const Roommate = mongoose.model(ROOMMATE_COLLECTION,schema);

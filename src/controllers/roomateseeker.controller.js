@@ -4,11 +4,12 @@ import { asyncHandler } from "../utils/asynchandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Roommate } from "../model/roommate.model.js";
 import { apiResponse } from "../utils/apiResponse.js";
+import { getCoordinates } from "../utils/getCoordinates.js";
 
 
 const addDetails = asyncHandler( async(req, res) => {
     // get all details from the request body
-    const {address, price, roomType, roomFor, bhk, near_landmark, extra_detail, ownerName, ownerMobile, lat, lng} = req.body;
+    const {address, price, roomType, roomFor, bhk, near_landmark, extra_detail, ownerName, ownerMobile} = req.body;
 
     // checking that all neccesary fields are present
     if ( [address, price, roomType, roomFor, bhk, ownerName, ownerMobile].some((field) => field?.trim() === "") ){
@@ -27,10 +28,18 @@ const addDetails = asyncHandler( async(req, res) => {
     // get the current user
     const currentUser = req.user;
     const user = await User.findById( currentUser._id);
-    // console.log("user", user)
+
+    // converting location into Geocordinates 
+    const { lat, lng } = await getCoordinates(address);
+    if ( !lat || !lng ) throw new ApiError(401, "not able to convert location into coordinates")
+
+    const checkIfAlreadyAddHouse = await Roommate.exists({ _userId:currentUser._id})
+    if (checkIfAlreadyAddHouse) throw new ApiError(400, "user already added one house cannot add more");
+
+
     if( !user ) throw new ApiError(500, "user not found");
 
-    // add all the details to the database
+    // add all the details to the databasere
     const addHouseDetail = await Roommate.create({
         _userId: user._id,
         address,
@@ -75,7 +84,7 @@ const removeDetails = asyncHandler( async(req, res) => {
 });
 
 const updateRoomDetails = asyncHandler( async(req, res) => {
-    const {address, price, roomType, roomFor, bhk, near_landmark, extra_detail, ownerName, ownerMobile, lat, lng} = req.body;
+    const {address, price, roomType, roomFor, bhk, near_landmark, extra_detail, ownerName, ownerMobile} = req.body;
 
     if ( [address, price, roomType, roomFor, bhk, ownerName, ownerMobile].some((field) => field?.trim() === "") ){
         throw new ApiError(400, "All fields are required");
@@ -96,6 +105,9 @@ const updateRoomDetails = asyncHandler( async(req, res) => {
     const currentUser = req.user;
     const user = await User.findById( currentUser._id);
     if( !user ) throw new ApiError(500, "user not found");
+
+    const { lat, lng } = await getCoordinates(address);
+    if ( !lat || !lng ) throw new ApiError(401, "not able to convert location into coordinates")
 
     const updateHouseDetail = await Roommate.updateOne({
         _userId: user._id,

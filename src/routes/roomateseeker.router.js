@@ -5,7 +5,7 @@ import { addDetails, removeDetails, updateRoomDetails } from '../controllers/roo
 
 const router = Router();
 
-router.route("/addDetails").post(verifyJwt, upload.array("roomImage"), addDetails);
+router.route("/addHouseDetail").post(verifyJwt, upload.array("roomImage"), addDetails);
 
 router.route("/removeDetails").post(verifyJwt, removeDetails);
 

@@ -31,8 +31,8 @@ const Schema=new mongoose.Schema({
                 extra_detail: {type: String} 
             },
             location:{
-                lat: {type: String},
-                lng: {type: String}
+                lat: {type: Number},
+                lng: {type: Number}
             },
         },
         _id:false,
@@ -40,6 +40,8 @@ const Schema=new mongoose.Schema({
     }
 },{timestamps:true,versionKey:false}); 
 
+// Add geospatial index for location field
+Schema.index({ 'description.location': '2dsphere' });
 
 const Landlord = mongoose.model(LANDLORD_COLLECTION,Schema);
 

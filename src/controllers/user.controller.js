@@ -68,6 +68,9 @@ const loginUser = asyncHandler( async (req, res) => {
     // get user detail from body
     const { email, password } = req.body;
 
+    // check if email and password is present or not
+    if ( !email || !password ) throw new ApiError(400, "Please provide email and password");
+
     // verify that user present in db or not if not the return them error saying register first
     const user = await User.findOne({ email });
     if ( !user ) throw new ApiError(404, "User not register, please register yourself first");

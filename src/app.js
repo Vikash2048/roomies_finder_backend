@@ -18,12 +18,15 @@ app.use(cookieParser())
 import userRouter from "./routes/user.router.js"
 import landlordRouter from "./routes/landlord.router.js"
 import roomateseekerRouter from "./routes/roomateseeker.router.js"
+import roomseekerRouter from "./routes/roomseeker.router.js"
 
 app.use("/api/v1/user", userRouter);
 
 app.use("/api/v1/landlord", landlordRouter);
 
 app.use("/api/v1/roomateseeker", roomateseekerRouter);
+
+app.use("/api/v1/roomseeker", roomseekerRouter);
 
 
 app.use(cookieParser());
